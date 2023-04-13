@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.highlandthink</groupId>
+	<artifactId>javafx-package-tool</artifactId>
+	<version>1.0.0</version>
+	<name>JavaFX Package Tool</name>
+	<description>javafx-package-tool</description>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>17</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>17.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>17.0.1</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<release>17</release>
+				</configuration>
+			</plugin>
+			<!-- 打包插件 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.2</version>
+				<configuration>
+					<archive>
+						<!-- 生成MANIFEST.MF的设置 -->
+						<manifest>
+							<!-- 为依赖包添加路径, 这些路径会写在MANIFEST文件的Class-Path下 -->
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>libs/</classpathPrefix>
+							<!-- jar启动入口类，这个需要修改 -->
+							<mainClass>
+								com.highlandthink.application.JavafxPackagerMain</mainClass>
+						</manifest>
+						<manifestEntries>
+							<Class-Path>.</Class-Path>
+						</manifestEntries>
+					</archive>
+					<excludes>
+						<exclude>resource/**</exclude>
+						<exclude>data/**</exclude>
+						<exclude>template/**</exclude>
+						<exclude>mapper/**</exclude>
+						<exclude>style/**</exclude>
+						<exclude>fonts/**</exclude>
+						<exclude>static/**</exclude>
+						<exclude>music/**</exclude>
+						<exclude>jdk/**</exclude>
+						<exclude>jfx-sdk/**</exclude>
+						<exclude>*.bat</exclude>
+						<exclude>*.lnk</exclude>
+						<exclude>config/**</exclude>
+						<exclude>*.txt</exclude>
+						<!-- <exclude>application.properties</exclude>
+						<exclude>banner.txt</exclude>
+						<exclude>generatorConfig.xml</exclude>
+						<exclude>mybatis-config.xml</exclude> -->
+					</excludes>
+					<outputDirectory>${project.build.directory}/dist</outputDirectory>
+				</configuration>
+			</plugin>
+			<!-- 分离依赖类库 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeScope>compile</includeScope>
+							<!-- 拷贝项目依赖包到libs/目录下 -->
+							<outputDirectory>
+								${project.build.directory}/dist/libs</outputDirectory>
+							<excludeTransitive>false</excludeTransitive>
+							<stripVersion>false</stripVersion>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+							<!--
+							<excludeGroupIds>org.openjfx</excludeGroupIds>
+							-->
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- 分离静态资源 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/main/resources</directory>
+									<excludes>
+										<exclude>application.properties</exclude>
+										<exclude>banner.txt</exclude>
+										<exclude>generatorConfig.xml</exclude>
+										<exclude>mybatis-config.xml</exclude>
+									</excludes>
+								</resource>
+							</resources>
+							<outputDirectory>
+								${project.build.directory}/dist/
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
